@@ -130,6 +130,88 @@ class KnowledgeBase(object):
         # Implementation goes here
         # Not required for the extra credit assignment
 
+
+        
+    
+
+    def spacehelper(self, fact_or_rule, depth):
+        indent = ""
+        for x in range(depth*4):
+                indent += " "
+        if isinstance(fact_or_rule, Fact):
+            
+                
+            #if it's a fact, run the function
+            if fact_or_rule in self.facts:
+                ## do the function
+                fct = self._get_fact(fact_or_rule)
+                strng = indent + "fact: " + str(fct.statement)
+                if fct.asserted:
+                    strng +=" ASSERTED"
+                strng += "\n"
+
+                #great now we've got a fact, properly indented, awesome
+                #ends with a new line 
+                
+                #recursive function here
+
+                #now we check if it's supported by anything
+                #if it is, use the current indent + 2 spaces for SUPPORTED BY
+                #need a new line
+                #this will recurse until only unsupported facts/rules
+                #gr8 and the facts/rules end with a new line 
+                if fct.supported_by:
+                    
+                    for x in fct.supported_by:
+                        strng+= indent + "  SUPPORTED BY" + "\n"
+                        strng+= self.spacehelper(x[0], depth + 1) 
+                        strng+= self.spacehelper(x[1], depth + 1)
+                        
+                return strng
+                
+
+
+            else:
+                ##if it's not in the KB
+                return "Fact is not in the KB"
+
+
+
+
+        if isinstance(fact_or_rule, Rule):
+            if fact_or_rule in self.rules:
+                rule = self._get_rule(fact_or_rule)
+                strng = indent + "rule: "
+                LHS = ""
+                for x in rule.lhs:
+                    LHS += str(x) + ", "
+                LHS = LHS[:-2]
+                strng += "(" + LHS + ") -> " + str(rule.rhs)
+                if rule.asserted:
+                    strng += " ASSERTED"
+                strng += "\n"
+                #completed line 
+
+                
+                if rule.supported_by:
+                    for x in rule.supported_by:
+                        strng+= indent + "  SUPPORTED BY"+ "\n"
+                        strng+= self.spacehelper(x[0], depth + 1)
+                        strng+= self.spacehelper(x[1], depth + 1) 
+                return strng
+                
+                
+
+            else:
+                return "Rule is not in the KB"
+
+
+
+        #not a fact or rule
+        else:
+            return False
+
+
     def kb_explain(self, fact_or_rule):
         """
         Explain where the fact or rule comes from
@@ -140,8 +222,79 @@ class KnowledgeBase(object):
         Returns:
             string explaining hierarchical support from other Facts and rules
         """
+
+        # fact: (eats nyala leaves)
+        #   
+
+
+        
         ####################################################
         # Student code goes here
+
+        if isinstance(fact_or_rule, Fact):
+            #if it's a fact, run the function
+            if fact_or_rule in self.facts:
+                ## do the function
+                fct = self._get_fact(fact_or_rule)
+                strng = "fact: " + str(fct.statement)
+                if fct.asserted:
+                    strng += " ASSERTED"
+                strng += "\n"
+                #recursive function here
+                if fct.supported_by:
+                    
+                    for x in fct.supported_by:
+                        strng+= "  SUPPORTED BY" + "\n"
+                        strng+= self.spacehelper(x[0], 1)
+                        strng+=  self.spacehelper(x[1], 1)
+                        
+                print(strng)        
+                return strng
+                
+
+
+            else:
+                ##if it's not in the KB
+                return "Fact is not in the KB"
+
+
+
+
+        if isinstance(fact_or_rule, Rule):
+            if fact_or_rule in self.rules:
+                rule = self._get_rule(fact_or_rule)
+                strng = "rule: "
+                LHS = ""
+                for x in rule.lhs:
+                    LHS += str(x) + ", "
+                LHS = LHS[:-2]
+                strng += "(" + LHS + ") -> " + str(rule.rhs)
+                if rule.asserted:
+                    strng += " ASSERTED"
+                strng += "\n"
+                #completed line 
+
+                
+                if rule.supported_by:
+                    for x in rule.supported_by:
+                        strng+= "  SUPPORTED BY" + "\n"
+                        strng+=  self.spacehelper(x[0], 1)
+                        strng+=  self.spacehelper(x[1], 1)
+                print(strng) 
+                return strng
+                
+                
+
+            else:
+                return "Rule is not in the KB"
+
+
+
+        #not a fact or rule
+        else:
+            return False
+            
+                    
 
 
 class InferenceEngine(object):
